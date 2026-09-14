@@ -61,6 +61,46 @@ unsigned char leerFicha(const unsigned char* memoria, int posicionLogica) {
 
     return 0;
 }
+void escribirFicha(unsigned char* memoria,int posicionLogica,unsigned char ficha) {
+    int bitInicial = calcularBitInicial(posicionLogica);
+    int byteIndex = calcularByteIndex(bitInicial);
+    int bitOffset = calcularBitOffset(bitInicial);
+
+    const unsigned char MASCARA_3_BITS = 7;
+
+    // Por ahora, solo manejamos fichas completas en un byte.
+    if (bitOffset <= 5) {
+        int desplazamiento = calcularDesplazamientoLectura(bitOffset);
+        // Llevar la máscara a la posición que ocupa la ficha
+        unsigned char mascaraFicha =
+            MASCARA_3_BITS << desplazamiento;
+
+        unsigned char mascaraLimpieza = ~mascaraFicha;
+        memoria[byteIndex] = memoria[byteIndex] & mascaraLimpieza; //limpiar
+        unsigned char fichaUbicada = (ficha & MASCARA_3_BITS) << desplazamiento; // Mover la nueva ficha a la posición correcta
+        memoria[byteIndex] = memoria[byteIndex] | fichaUbicada;
+    }
+    else if (bitOffset == 6) {
+        unsigned char partePrimerByte = (ficha >> 1) & MASCARA_3_BITS;
+        unsigned char parteSegundoByte = ficha & MASCARA_3_BITS;
+
+        memoria[byteIndex] = memoria[byteIndex] & 0b11111100;
+        memoria[byteIndex] = memoria[byteIndex] | partePrimerByte;
+
+        memoria[byteIndex + 1] = memoria[byteIndex + 1] & 0b01111111;
+        memoria[byteIndex + 1] = memoria[byteIndex + 1] | (parteSegundoByte << 7);
+    }
+    else if (bitOffset == 7) {
+        unsigned char partePrimerByte = (ficha >> 2) & MASCARA_3_BITS;
+        unsigned char parteSegundoByte = ficha & MASCARA_3_BITS;
+
+        memoria[byteIndex] = memoria[byteIndex] & 0b11111110;
+        memoria[byteIndex] = memoria[byteIndex] | partePrimerByte;
+
+        memoria[byteIndex + 1] = memoria[byteIndex + 1] & 0b00111111;
+        memoria[byteIndex + 1] = memoria[byteIndex + 1] | (parteSegundoByte << 6);
+    }
+}
 // MAIN
 //  MAIN
 // MAIN
@@ -69,7 +109,7 @@ int main() {
 
     tablero[0] = 0b10110110;
     tablero[1] = 0b11011011;
-    tablero[2] = 0b00101101;
+    tablero[2] = 0b01101101;
 
     cout << "Byte 0: " << (int)tablero[0] << endl;
     cout << "Byte 1: " << (int)tablero[1] << endl;
@@ -81,9 +121,19 @@ int main() {
         int bitInicial = calcularBitInicial(posicion);
         int bitOffset = calcularBitOffset(bitInicial);
         int desplazamiento = calcularDesplazamientoLectura(bitOffset);
-        cout << desplazamiento << "" << endl;
+        //cout << desplazamiento << "" << endl;
     }
-
+    cout << "cambio ficha 1 aqui " << endl;
+    escribirFicha(tablero, 1, FICHA_4);
+    escribirFicha(tablero, 2, FICHA_4);
+    escribirFicha(tablero, 5, FICHA_4);
+    for (int posicion = 0; posicion < 8; posicion++) {
+        cout << "Ficha " << posicion << ": " << (int)leerFicha(tablero, posicion)<< endl;
+        int bitInicial = calcularBitInicial(posicion);
+        int bitOffset = calcularBitOffset(bitInicial);
+        int desplazamiento = calcularDesplazamientoLectura(bitOffset);
+        //cout << desplazamiento << "" << endl;
+    }
     delete[] tablero;
 
     return 0;
