@@ -101,39 +101,89 @@ void escribirFicha(unsigned char* memoria,int posicionLogica,unsigned char ficha
         memoria[byteIndex + 1] = memoria[byteIndex + 1] | (parteSegundoByte << 6);
     }
 }
+void mostrarTableroNumerico(const unsigned char* tablero, int filas, int columnas) {
+    cout << "     ";
+    for (int columna = 1; columna <= columnas; columna++) {
+        cout << "C" << columna << " ";
+    }
+
+    cout << endl;
+
+    for (int fila = 0; fila < filas; fila++) {
+        cout << "F" << fila + 1 << ":  ";
+
+        for (int columna = 0; columna < columnas; columna++) {
+            int posicionLogica =
+                calcularPosicionLogica(fila, columna, columnas);
+
+            unsigned char ficha =
+                leerFicha(tablero, posicionLogica);
+
+            cout << (int)ficha << "  ";
+        }
+
+        cout << endl;
+    }
+}
+void llenarTablero(unsigned char* tablero, int filas, int columnas, unsigned char ficha) {
+    int totalFichas = filas * columnas;
+    for (int posicion = 0; posicion < totalFichas; posicion++) {
+        escribirFicha(tablero, posicion, ficha);
+    }
+}
+#include <cstdlib>  // rand(), srand()
+#include <ctime>    // time()
+
+void llenarTableroAleatorio(unsigned char* tablero,
+                            int filas,
+                            int columnas) {
+    int totalFichas = filas * columnas;
+
+    for (int posicion = 0; posicion < totalFichas; posicion++) {
+        unsigned char ficha = rand() % 6;  // 0,1,2,3,4,5
+        escribirFicha(tablero, posicion, ficha);
+    }
+}
 // MAIN
 //  MAIN
 // MAIN
 int main() {
-    unsigned char* tablero = new unsigned char[3];
+    srand(time(nullptr));
+    unsigned char* tablero = new unsigned char[4];
+    int filas = 3;
+    int columnas = 2;
 
-    tablero[0] = 0b10110110;
-    tablero[1] = 0b11011011;
-    tablero[2] = 0b01101101;
+    llenarTablero(tablero, filas, columnas, FICHA_1);
+    llenarTableroAleatorio(tablero, filas, columnas);
+    mostrarTableroNumerico(tablero, filas, columnas);
 
-    cout << "Byte 0: " << (int)tablero[0] << endl;
-    cout << "Byte 1: " << (int)tablero[1] << endl;
+    // tablero[0] = 0b10110110;
+    // tablero[1] = 0b11011011;
+    // tablero[2] = 0b01101101;
+    // tablero[3] = 0b10110110;
 
     cout << endl;
 
-    for (int posicion = 0; posicion < 8; posicion++) {
-        cout << "Ficha " << posicion << ": " << (int)leerFicha(tablero, posicion)<< endl;
-        int bitInicial = calcularBitInicial(posicion);
-        int bitOffset = calcularBitOffset(bitInicial);
-        int desplazamiento = calcularDesplazamientoLectura(bitOffset);
-        //cout << desplazamiento << "" << endl;
-    }
-    cout << "cambio ficha 1 aqui " << endl;
+    // for (int posicion = 0; posicion <= filas*columnas; posicion++) {
+    //     cout << "Ficha " << posicion << ": " << (int)leerFicha(tablero, posicion)<< endl;
+    //     int bitInicial = calcularBitInicial(posicion);
+    //     int bitOffset = calcularBitOffset(bitInicial);
+    //     int desplazamiento = calcularDesplazamientoLectura(bitOffset);
+    //     //cout << desplazamiento << "" << endl;
+    // }
+    // cout << "cambio ficha 1 aqui " << endl;
     escribirFicha(tablero, 1, FICHA_4);
     escribirFicha(tablero, 2, FICHA_4);
     escribirFicha(tablero, 5, FICHA_4);
-    for (int posicion = 0; posicion < 8; posicion++) {
-        cout << "Ficha " << posicion << ": " << (int)leerFicha(tablero, posicion)<< endl;
-        int bitInicial = calcularBitInicial(posicion);
-        int bitOffset = calcularBitOffset(bitInicial);
-        int desplazamiento = calcularDesplazamientoLectura(bitOffset);
-        //cout << desplazamiento << "" << endl;
-    }
+    // for (int posicion = 0; posicion <= filas*columnas; posicion++) {
+    //     cout << "Ficha " << posicion << ": " << (int)leerFicha(tablero, posicion)<< endl;
+    //     int bitInicial = calcularBitInicial(posicion);
+    //     int bitOffset = calcularBitOffset(bitInicial);
+    //     int desplazamiento = calcularDesplazamientoLectura(bitOffset);
+    //     //cout << desplazamiento << "" << endl;
+    // }
+
+    mostrarTableroNumerico(tablero, filas, columnas);
     delete[] tablero;
 
     return 0;
