@@ -15,7 +15,8 @@ int calcularPosicionLogica(int fila, int columna, int columnas) {
 }
 
 int calcularBitInicial(int posicionLogica) {
-    return posicionLogica * BITS_POR_FICHA;
+    int bitInicial= posicionLogica * BITS_POR_FICHA;
+    return bitInicial;
 }
 
 int calcularByteIndex(int bitInicial) {
@@ -25,74 +26,48 @@ int calcularByteIndex(int bitInicial) {
 int calcularBitOffset(int bitInicial) { //en que posicion del byte está para ver si esta partida o no
     return bitInicial % BITS_POR_BYTE;
 }
-// ============================================
-// FUNCIÓN PRINCIPAL
-// ============================================
 
+int calcularDesplazamientoLectura(int bitOffset) {
+    return BITS_POR_BYTE - BITS_POR_FICHA - bitOffset;
+}
+
+unsigned char leerFicha(const unsigned char* memoria, int posicionLogica) {
+    int bitInicial = calcularBitInicial(posicionLogica);
+
+    int byteIndex = calcularByteIndex(bitInicial);
+    int bitOffset = calcularBitOffset(bitInicial);
+
+    const unsigned char MASCARA_3_BITS = 7;
+
+    // Por ahora, solo manejamos fichas completas en un byte.
+    if (bitOffset <= 5) {
+        int desplazamiento = calcularDesplazamientoLectura(bitOffset);
+
+        return (memoria[byteIndex] >> desplazamiento) & MASCARA_3_BITS;
+    }
+
+    // Todavía no implementamos el caso de ficha partida.
+    return 0;
+}
+// MAIN
+//  MAIN
+// MAIN
 int main() {
-    // ========================================
-    // Prueba 1: calcularCantidadBytes
-    // ========================================
-    int filas = 3;
-    int columnas = 4;
-    int bytes = calcularCantidadBytes(filas, columnas);
-    cout << "Tablero " << filas << "x" << columnas
-         << " necesita " << bytes << " bytes" << endl;
+    unsigned char* tablero = new unsigned char[2];
 
-    // ========================================
-    // Prueba 2: calcularPosicionLogica
-    // ========================================
-    int filaPrueba = 0;
-    int columnaPrueba = 2;
-    int posicion = calcularPosicionLogica(filaPrueba, columnaPrueba, columnas);
-    cout << "Posicion (" << filaPrueba << "," << columnaPrueba
-         << ") = " << posicion << endl;
+    // Inicializar los bytes.
+    tablero[0] = 0b10010101;
+    tablero[1] = 0b00111001;
 
-    // ========================================
-    // Prueba 3: calcularBitInicial
-    // ========================================
-    int bit = calcularBitInicial(posicion);
-    cout << "Bit inicial para la posicion " << posicion << " = " << bit << endl;
+    cout << "Byte 0: " << (int)tablero[0] << endl;
+    cout << "Byte 1: " << (int)tablero[1] << endl;
 
-    // ========================================
-    // Prueba 4: Calcular byte y offset usando funciones
-    // ========================================
-    int byteIndex = calcularByteIndex(bit);
-    int bitOffset = calcularBitOffset(bit);
+    cout << endl;
 
-    cout << "Byte index = " << byteIndex << endl;
-    cout << "Bit offset = " << bitOffset << endl;
+    cout << "Ficha 0: " << (int)leerFicha(tablero, 0) << endl;
+    cout << "Ficha 1: " << (int)leerFicha(tablero, 1) << endl;
 
-    // ¿Cruza dos bytes?
-    if (bitOffset > 5) {
-        cout << "La ficha cruza DOS bytes" << endl;
-    } else {
-        cout << "La ficha esta completa en UN byte" << endl;
-    }
-
-    // ========================================
-    // Probar con varias posiciones
-    // ========================================
-    cout << "\n--- Probando todas las posiciones del tablero ---" << endl;
-
-    for (int f = 0; f < filas; ++f) {
-        for (int c = 0; c < columnas; ++c) {
-            int pos = calcularPosicionLogica(f, c, columnas);
-            int bitI = calcularBitInicial(pos);
-            int byteI = calcularByteIndex(bitI);
-            int bitO = calcularBitOffset(bitI);
-
-            cout << "(" << f << "," << c << ") -> pos=" << pos
-                 << ", bit=" << bitI
-                 << ", byte=" << byteI
-                 << ", offset=" << bitO;
-
-            if (bitO > 5) {
-                cout << " [CRUZA 2 bytes]";
-            }
-            cout << endl;
-        }
-    }
+    delete[] tablero;
 
     return 0;
 }
