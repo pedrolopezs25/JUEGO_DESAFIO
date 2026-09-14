@@ -28,12 +28,12 @@ int calcularBitOffset(int bitInicial) { //en que posicion del byte está para ve
 }
 
 int calcularDesplazamientoLectura(int bitOffset) {
-    return BITS_POR_BYTE - BITS_POR_FICHA - bitOffset;
+    int desplazamiento = BITS_POR_BYTE - BITS_POR_FICHA - bitOffset;
+    return desplazamiento;
 }
 
 unsigned char leerFicha(const unsigned char* memoria, int posicionLogica) {
     int bitInicial = calcularBitInicial(posicionLogica);
-
     int byteIndex = calcularByteIndex(bitInicial);
     int bitOffset = calcularBitOffset(bitInicial);
 
@@ -42,30 +42,47 @@ unsigned char leerFicha(const unsigned char* memoria, int posicionLogica) {
     // Por ahora, solo manejamos fichas completas en un byte.
     if (bitOffset <= 5) {
         int desplazamiento = calcularDesplazamientoLectura(bitOffset);
-
-        return (memoria[byteIndex] >> desplazamiento) & MASCARA_3_BITS;
+        unsigned char ficha = (memoria[byteIndex] >> desplazamiento) & MASCARA_3_BITS;
+        return ficha;
+    }
+    else {
+        int desplazamiento = calcularDesplazamientoLectura(bitOffset);
+        unsigned char ficha1 = (memoria[byteIndex] << desplazamiento*-1) & MASCARA_3_BITS;
+        if(bitOffset == 6){
+            unsigned char ficha2 = (memoria[byteIndex+1] >> 7) & MASCARA_3_BITS;
+            return ficha1|ficha2;}
+        else if(bitOffset == 7){
+            unsigned char ficha2 = (memoria[byteIndex+1] >> 6) & MASCARA_3_BITS;
+            return ficha1|ficha2;
+        }
+        return ficha1;
     }
 
-    // Todavía no implementamos el caso de ficha partida.
+
     return 0;
 }
 // MAIN
 //  MAIN
 // MAIN
 int main() {
-    unsigned char* tablero = new unsigned char[2];
+    unsigned char* tablero = new unsigned char[3];
 
-    // Inicializar los bytes.
-    tablero[0] = 0b10010101;
-    tablero[1] = 0b00111001;
+    tablero[0] = 0b10110110;
+    tablero[1] = 0b11011011;
+    tablero[2] = 0b00101101;
 
     cout << "Byte 0: " << (int)tablero[0] << endl;
     cout << "Byte 1: " << (int)tablero[1] << endl;
 
     cout << endl;
 
-    cout << "Ficha 0: " << (int)leerFicha(tablero, 0) << endl;
-    cout << "Ficha 1: " << (int)leerFicha(tablero, 1) << endl;
+    for (int posicion = 0; posicion < 8; posicion++) {
+        cout << "Ficha " << posicion << ": " << (int)leerFicha(tablero, posicion)<< endl;
+        int bitInicial = calcularBitInicial(posicion);
+        int bitOffset = calcularBitOffset(bitInicial);
+        int desplazamiento = calcularDesplazamientoLectura(bitOffset);
+        cout << desplazamiento << "" << endl;
+    }
 
     delete[] tablero;
 
