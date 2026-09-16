@@ -8,7 +8,7 @@ const unsigned char FICHA_3 = 2;
 const unsigned char FICHA_4 = 3;
 const unsigned char FICHA_5 = 4;
 const unsigned char FICHA_6 = 5;
-const unsigned char VACIO = 6;
+const unsigned char FICHA_VACIA = 6;
 const unsigned char ESPECIAL = 7;
 
 // Constantes de representación

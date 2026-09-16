@@ -1,7 +1,8 @@
 #include <iostream>
 #include "fichas.h"
-
 using namespace std;
+
+
 
 int calcularCantidadBytes(int filas, int columnas) {
     int bitsTotales = filas * columnas * BITS_POR_FICHA;
@@ -134,9 +135,7 @@ void llenarTablero(unsigned char* tablero, int filas, int columnas, unsigned cha
 #include <cstdlib>  // rand(), srand()
 #include <ctime>    // time()
 
-void llenarTableroAleatorio(unsigned char* tablero,
-                            int filas,
-                            int columnas) {
+void llenarTableroAleatorio(unsigned char* tablero, int filas,int columnas) {
     int totalFichas = filas * columnas;
 
     for (int posicion = 0; posicion < totalFichas; posicion++) {
