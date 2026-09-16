@@ -80,6 +80,20 @@ bool detectarCombinaciones(const unsigned char* tablero,bool* marcadores,int fil
 
     return hayCombinacion;
 }
+void eliminarFichasMarcadas(unsigned char* tablero, const bool* marcadores, int filas, int columnas) {
+    int totalFichas = filas * columnas;
+
+    // 1. Eliminar las fichas marcadas
+    for (int posicion = 0; posicion < totalFichas; posicion++) {
+        if (marcadores[posicion]) {
+            escribirFicha(tablero, posicion, FICHA_VACIA);
+        }
+    aplicarGravedadEnColumna(tablero, filas, columnas);
+    }
+
+    // 2. Aplicar gravedad y rellenar (usando tu función integrada)
+
+}
 // MAIN
 //  MAIN
 // MAIN
@@ -124,8 +138,11 @@ int main() {
     mostrarTableroNumerico(tablero, filas, columnas);
 
     eliminarFicha(tablero, filas, columnas, 2, 1);
-    eliminarFicha(tablero, filas, columnas, 1, 3);
-     mostrarTableroNumerico(tablero, filas, columnas);
+    eliminarFicha(tablero, filas, columnas, 4, 5);
+    eliminarFicha(tablero, filas, columnas, 5, 9);
+    eliminarFicha(tablero, filas, columnas, 4, 9);
+
+    mostrarTableroNumerico(tablero, filas, columnas);
 
     aplicarGravedadEnColumna(tablero,filas,columnas);
      mostrarTableroNumerico(tablero, filas, columnas);
@@ -139,14 +156,17 @@ int main() {
              cout << "Fila " << fila << ": ";
              for (int columna = 0; columna < columnas; columna++) {
                  int posicion = calcularPosicionLogica(fila, columna, columnas);
-                 cout << (marcadores[posicion] ? "C" : "o") << " ";
+                 cout << (marcadores[posicion] ? "X" : ".") << " ";
              }
              cout << endl;
          }
      } else {
          cout << "No hay combinaciones." << endl;
      }
+    eliminarFichasMarcadas(tablero, marcadores,filas, columnas);
+    mostrarTableroNumerico(tablero, filas, columnas);
     delete[] tablero;
+
 
     return 0;
 }

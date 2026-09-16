@@ -177,16 +177,17 @@ void aplicarGravedadEnColumna(unsigned char* tablero, int filas, int columnas) {
                     escribirFicha(tablero, posicionOrigen, FICHA_VACIA);
                 }
             }
-        }
-        if(fila == 0){
-            for (int columna = columnas-1; columna>=0; columna -- ){
-                if (esFichaVacia(tablero, filas, columnas, fila, columna)) {
-                    int posicion = calcularPosicionLogica(fila, columna, columnas);
-                    unsigned char ficha = rand() % 6;  // 0,1,2,3,4,5
-                    escribirFicha(tablero, posicion, ficha);
+            if(fila == 0){
+                for (int columna = columnas-1; columna>=0; columna -- ){
+                    if (esFichaVacia(tablero, filas, columnas, fila, columna)) {
+                        int posicion = calcularPosicionLogica(fila, columna, columnas);
+                        unsigned char ficha = rand() % 6;  // 0,1,2,3,4,5
+                        escribirFicha(tablero, posicion, ficha);
 
+                    }
                 }
-            }
+        }
+
         }}
 
 }
