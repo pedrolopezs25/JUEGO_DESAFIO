@@ -3,50 +3,82 @@
 #include "funciones.h"
 using namespace std;
 
+bool detectarCombinaciones(const unsigned char* tablero,bool* marcadores,int filas,int columnas) {
+    int totalFichas = filas * columnas;
 
-void eliminarFicha(unsigned char* tablero, int filas, int columnas, int fila, int columna) {
-    int posicion = calcularPosicionLogica(fila, columna, columnas);
-    escribirFicha(tablero, posicion, FICHA_VACIA);
-}
-bool esFichaVacia(const unsigned char* tablero, int filas, int columnas, int fila, int columna) {
-    int posicion = calcularPosicionLogica(fila, columna, columnas);
-    unsigned char ficha = leerFicha(tablero, posicion);
-    return ficha == FICHA_VACIA;
-}
-void aplicarGravedadEnColumna(unsigned char* tablero, int filas, int columnas) {
-    for (int fila = filas - 1; fila >= 0; fila--) {
-        for (int columna = columnas-1; columna>=0; columna -- ){
-        if (esFichaVacia(tablero, filas, columnas, fila, columna)&&fila>0) {
-            int filaOrigen = -1;
-            for (int f = fila - 1; f >= 0; f--) {
-                if (!esFichaVacia(tablero, filas, columnas, f, columna)) {
-                    filaOrigen = f;
+    // 1. Inicializar marcadores en false
+    for (int i = 0; i < totalFichas; i++) {
+        marcadores[i] = false;
+    }
+    bool hayCombinacion = false;
+
+    // 2. Detectar combinaciones en filas
+    for (int fila = 0; fila < filas; fila++) {
+        int columna = 0;
+        while (columna < columnas) {
+            int posicionActual = calcularPosicionLogica(fila, columna, columnas);
+            unsigned char fichaActual = leerFicha(tablero, posicionActual);
+
+            // Contar fichas iguales consecutivas
+            int contador = 1;
+            while (columna + contador < columnas) {
+                int posicionSiguiente = calcularPosicionLogica(fila, columna + contador, columnas);
+                unsigned char fichaSiguiente = leerFicha(tablero, posicionSiguiente);
+
+                if (fichaSiguiente == fichaActual && fichaActual != FICHA_VACIA) {
+                    contador++;
+                } else {
                     break;
                 }
             }
 
-            if (filaOrigen != -1) {
-                int posicionOrigen = calcularPosicionLogica(filaOrigen, columna, columnas);
-                unsigned char ficha = leerFicha(tablero, posicionOrigen);
-
-                int posicionDestino = calcularPosicionLogica(fila, columna, columnas);
-                escribirFicha(tablero, posicionDestino, ficha);
-
-                escribirFicha(tablero, posicionOrigen, FICHA_VACIA);
-            }
-        }
-        }
-        if(fila == 0){
-            for (int columna = columnas-1; columna>=0; columna -- ){
-                if (esFichaVacia(tablero, filas, columnas, fila, columna)) {
-                    int posicion = calcularPosicionLogica(fila, columna, columnas);
-                    unsigned char ficha = rand() % 6;  // 0,1,2,3,4,5
-                    escribirFicha(tablero, posicion, ficha);
-
+            // Si hay 3 o más, marcar
+            if (contador >= 3) {
+                hayCombinacion = true;
+                for (int k = 0; k < contador; k++) {
+                    int posicionMarcar = calcularPosicionLogica(fila, columna + k, columnas);
+                    marcadores[posicionMarcar] = true;
                 }
             }
-        }}
 
+            columna += contador;
+        }
+    }
+
+    // 3. Detectar combinaciones en columnas
+    for (int columna = 0; columna < columnas; columna++) {
+        int fila = 0;
+        while (fila < filas) {
+            int posicionActual = calcularPosicionLogica(fila, columna, columnas);
+            unsigned char fichaActual = leerFicha(tablero, posicionActual);
+
+            // Contar fichas iguales consecutivas
+            int contador = 1;
+            while (fila + contador < filas) {
+                int posicionSiguiente = calcularPosicionLogica(fila + contador, columna, columnas);
+                unsigned char fichaSiguiente = leerFicha(tablero, posicionSiguiente);
+
+                if (fichaSiguiente == fichaActual && fichaActual != FICHA_VACIA) {
+                    contador++;
+                } else {
+                    break;
+                }
+            }
+
+            // Si hay 3 o más, marcar
+            if (contador >= 3) {
+                hayCombinacion = true;
+                for (int k = 0; k < contador; k++) {
+                    int posicionMarcar = calcularPosicionLogica(fila + k, columna, columnas);
+                    marcadores[posicionMarcar] = true;
+                }
+            }
+
+            fila += contador;
+        }
+    }
+
+    return hayCombinacion;
 }
 // MAIN
 //  MAIN
@@ -54,8 +86,10 @@ void aplicarGravedadEnColumna(unsigned char* tablero, int filas, int columnas) {
 int main() {
     srand(time(nullptr));
     unsigned char* tablero = new unsigned char[4];
-    int filas = 4;
-    int columnas = 8;
+
+    int filas = 6;
+    int columnas = 10;
+    bool* marcadores = new bool[filas * columnas];
 
     llenarTablero(tablero, filas, columnas, FICHA_1);
     llenarTableroAleatorio(tablero, filas, columnas);
@@ -95,6 +129,23 @@ int main() {
 
     aplicarGravedadEnColumna(tablero,filas,columnas);
      mostrarTableroNumerico(tablero, filas, columnas);
+
+    bool hayCombinacion = detectarCombinaciones(tablero, marcadores, filas, columnas);
+    if (hayCombinacion) {
+         cout << "Se encontraron combinaciones!" << endl;
+
+         // Mostrar cuáles fichas están marcadas
+         for (int fila = 0; fila < filas; fila++) {
+             cout << "Fila " << fila << ": ";
+             for (int columna = 0; columna < columnas; columna++) {
+                 int posicion = calcularPosicionLogica(fila, columna, columnas);
+                 cout << (marcadores[posicion] ? "C" : "o") << " ";
+             }
+             cout << endl;
+         }
+     } else {
+         cout << "No hay combinaciones." << endl;
+     }
     delete[] tablero;
 
     return 0;

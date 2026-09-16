@@ -143,3 +143,50 @@ void llenarTableroAleatorio(unsigned char* tablero, int filas,int columnas) {
         escribirFicha(tablero, posicion, ficha);
     }
 }
+
+
+
+void eliminarFicha(unsigned char* tablero, int filas, int columnas, int fila, int columna) {
+    int posicion = calcularPosicionLogica(fila, columna, columnas);
+    escribirFicha(tablero, posicion, FICHA_VACIA);
+}
+bool esFichaVacia(const unsigned char* tablero, int filas, int columnas, int fila, int columna) {
+    int posicion = calcularPosicionLogica(fila, columna, columnas);
+    unsigned char ficha = leerFicha(tablero, posicion);
+    return ficha == FICHA_VACIA;
+}
+void aplicarGravedadEnColumna(unsigned char* tablero, int filas, int columnas) {
+    for (int fila = filas - 1; fila >= 0; fila--) {
+        for (int columna = columnas-1; columna>=0; columna -- ){
+            if (esFichaVacia(tablero, filas, columnas, fila, columna)&&fila>0) {
+                int filaOrigen = -1;
+                for (int f = fila - 1; f >= 0; f--) {
+                    if (!esFichaVacia(tablero, filas, columnas, f, columna)) {
+                        filaOrigen = f;
+                        break;
+                    }
+                }
+
+                if (filaOrigen != -1) {
+                    int posicionOrigen = calcularPosicionLogica(filaOrigen, columna, columnas);
+                    unsigned char ficha = leerFicha(tablero, posicionOrigen);
+
+                    int posicionDestino = calcularPosicionLogica(fila, columna, columnas);
+                    escribirFicha(tablero, posicionDestino, ficha);
+
+                    escribirFicha(tablero, posicionOrigen, FICHA_VACIA);
+                }
+            }
+        }
+        if(fila == 0){
+            for (int columna = columnas-1; columna>=0; columna -- ){
+                if (esFichaVacia(tablero, filas, columnas, fila, columna)) {
+                    int posicion = calcularPosicionLogica(fila, columna, columnas);
+                    unsigned char ficha = rand() % 6;  // 0,1,2,3,4,5
+                    escribirFicha(tablero, posicion, ficha);
+
+                }
+            }
+        }}
+
+}

@@ -18,9 +18,12 @@ void escribirFicha(unsigned char* memoria, int posicionLogica, unsigned char fic
 void mostrarTableroNumerico(const unsigned char* tablero, int filas, int columnas);
 
 // Inicialización
-void llenarTablero(unsigned char* tablero, int filas, int columnas, unsigned char ficha);
-void llenarTableroConSecuencia(unsigned char* tablero, int filas, int columnas);
+void llenarTablero(unsigned char* tablero, int filas, int columnas, unsigned char ficha); //llena con 0
 void llenarTableroAleatorio(unsigned char* tablero, int filas, int columnas);
+
+void eliminarFicha(unsigned char* tablero, int filas, int columnas, int fila, int columna);
+bool esFichaVacia(const unsigned char* tablero, int filas, int columnas, int fila, int columna);
+void aplicarGravedadEnColumna(unsigned char* tablero, int filas, int columnas);
 
 
 #endif // FUNCIONES_H
