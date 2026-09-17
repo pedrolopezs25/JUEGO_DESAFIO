@@ -278,3 +278,26 @@ void eliminarFichasMarcadas(unsigned char* tablero, const bool* marcadores, int 
         aplicarGravedadEnColumna(tablero, filas, columnas);
     }
 }
+
+void procesarCombinaciones(unsigned char* tablero, int filas, int columnas, int& cascadas, int& fichasEliminadas) {
+    int totalFichas = filas * columnas;
+    bool* marcadores = new bool[totalFichas];
+
+    bool hayCombinacion = detectarCombinaciones(tablero, marcadores, filas, columnas);
+    cascadas = 0;
+    fichasEliminadas = 0;
+    while (hayCombinacion) {
+        cascadas++;
+
+        for (int i = 0; i < totalFichas; i++) {
+            if (marcadores[i]) {
+                fichasEliminadas++;
+            }
+        }
+        eliminarFichasMarcadas(tablero, marcadores, filas, columnas);
+        hayCombinacion = detectarCombinaciones(tablero, marcadores, filas, columnas);
+    }
+
+    delete[] marcadores;
+
+}

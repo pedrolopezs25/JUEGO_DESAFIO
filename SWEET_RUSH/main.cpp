@@ -3,19 +3,12 @@
 #include "funciones.h"
 using namespace std;
 
-void procesarCombinaciones(unsigned char* tablero, int filas, int columnas) {
-    int totalFichas = filas * columnas;
-    bool* marcadores = new bool[totalFichas];
-
-    bool hayCombinacion = detectarCombinaciones(tablero, marcadores, filas, columnas);
-
-    while (hayCombinacion) {
-        eliminarFichasMarcadas(tablero, marcadores, filas, columnas);
-        hayCombinacion = detectarCombinaciones(tablero, marcadores, filas, columnas);
-    }
-
-    delete[] marcadores;
-}
+// void eliminarFichaYAplicarGravedad(unsigned char* tablero,int filas,int columnas,int fila,int columna) {
+//     eliminarFicha(tablero, filas, columnas, fila, columna);
+//     int fichas, cascadas = procesarCombinaciones(tablero, filas, columnas);
+//     cout << "cascadas completadas: " << cascadas << " fichas eliminadas:  " << fichas << endl;
+//     aplicarGravedadEnColumna(tablero, filas, columnas);
+// }
 // MAIN
 //  MAIN
 // MAIN
@@ -25,70 +18,35 @@ int main() {
 
     int filas = 6;
     int columnas = 10;
-    bool* marcadores = new bool[filas * columnas];
+    //bool* marcadores = new bool[filas * columnas];
 
-    llenarTablero(tablero, filas, columnas, FICHA_1);
+//##################################################################
+
     llenarTableroAleatorio(tablero, filas, columnas);
+    int fila, columna;
+    cout << "Tablero inicial:" << endl;
+    mostrarTableroNumerico(tablero, filas, columnas);
+    cout << "Ingrese fila y columna de ficha a eliminar, empiece a contar desde 0" << endl;
+    cout<< "Fila: " ;
+    cin >> fila;
+    cout<< "\nColumna: ";
+    cin >> columna;
+    eliminarFicha(tablero, filas, columnas, fila, columna);
+    aplicarGravedadEnColumna(tablero, filas, columnas);
+
+    cout << "\nEliminando ficha en fila: " << fila << "& Columa:" << columna << endl;
+    mostrarTableroNumerico(tablero, filas, columnas);
+    int cascadas = 0;
+    int fichasEliminadas = 0;
+
+    procesarCombinaciones(tablero, filas, columnas, cascadas, fichasEliminadas);
+
+    cout << "cascadas ejecutadas: " << cascadas << endl;
+    cout << "fichas eliminadas: " << fichasEliminadas << endl;
+
+    cout << "Tablero despues de eliminar:" << endl;
     mostrarTableroNumerico(tablero, filas, columnas);
 
-    // tablero[0] = 0b10110110;
-    // tablero[1] = 0b11011011;
-    // tablero[2] = 0b01101101;
-    // tablero[3] = 0b10110110;
-
-    cout << endl;
-
-    // for (int posicion = 0; posicion <= filas*columnas; posicion++) {
-    //     cout << "Ficha " << posicion << ": " << (int)leerFicha(tablero, posicion)<< endl;
-    //     int bitInicial = calcularBitInicial(posicion);
-    //     int bitOffset = calcularBitOffset(bitInicial);
-    //     int desplazamiento = calcularDesplazamientoLectura(bitOffset);
-    //     //cout << desplazamiento << "" << endl;
-    // }
-    // cout << "cambio ficha 1 aqui " << endl;
-    escribirFicha(tablero, 1, FICHA_4);
-    escribirFicha(tablero, 2, FICHA_4);
-    escribirFicha(tablero, 5, FICHA_4);
-    // for (int posicion = 0; posicion <= filas*columnas; posicion++) {
-    //     cout << "Ficha " << posicion << ": " << (int)leerFicha(tablero, posicion)<< endl;
-    //     int bitInicial = calcularBitInicial(posicion);
-    //     int bitOffset = calcularBitOffset(bitInicial);
-    //     int desplazamiento = calcularDesplazamientoLectura(bitOffset);
-    //     //cout << desplazamiento << "" << endl;
-    // }
-
-    mostrarTableroNumerico(tablero, filas, columnas);
-
-    eliminarFicha(tablero, filas, columnas, 2, 1);
-    eliminarFicha(tablero, filas, columnas, 4, 5);
-    eliminarFicha(tablero, filas, columnas, 5, 9);
-    eliminarFicha(tablero, filas, columnas, 4, 9);
-
-    mostrarTableroNumerico(tablero, filas, columnas);
-
-    aplicarGravedadEnColumna(tablero,filas,columnas);
-     mostrarTableroNumerico(tablero, filas, columnas);
-
-    bool hayCombinacion = detectarCombinaciones(tablero, marcadores, filas, columnas);
-    if (hayCombinacion) {
-         cout << "Se encontraron combinaciones!" << endl;
-
-         // Mostrar cuáles fichas están marcadas
-         for (int fila = 0; fila < filas; fila++) {
-             cout << "Fila " << fila << ": ";
-             for (int columna = 0; columna < columnas; columna++) {
-                 int posicion = calcularPosicionLogica(fila, columna, columnas);
-                 cout << (marcadores[posicion] ? "X" : ".") << " ";
-             }
-             cout << endl;
-         }
-     } else {
-         cout << "No hay combinaciones." << endl;
-     }
-    eliminarFichasMarcadas(tablero, marcadores,filas, columnas);
-    mostrarTableroNumerico(tablero, filas, columnas);
-    procesarCombinaciones(tablero,filas,columnas);
-    mostrarTableroNumerico(tablero, filas, columnas);
     delete[] tablero;
 
 
