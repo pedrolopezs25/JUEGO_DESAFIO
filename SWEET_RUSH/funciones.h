@@ -24,7 +24,8 @@ void llenarTableroAleatorio(unsigned char* tablero, int filas, int columnas);
 void eliminarFicha(unsigned char* tablero, int filas, int columnas, int fila, int columna);
 bool esFichaVacia(const unsigned char* tablero, int filas, int columnas, int fila, int columna);
 void aplicarGravedadEnColumna(unsigned char* tablero, int filas, int columnas);
-
+bool detectarCombinaciones(const unsigned char* tablero,bool* marcadores,int filas,int columnas);
+void eliminarFichasMarcadas(unsigned char* tablero, const bool* marcadores, int filas, int columnas);
 
 #endif // FUNCIONES_H
 

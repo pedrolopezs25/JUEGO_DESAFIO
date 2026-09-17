@@ -189,5 +189,92 @@ void aplicarGravedadEnColumna(unsigned char* tablero, int filas, int columnas) {
         }
 
         }}
+}
 
+bool detectarCombinaciones(const unsigned char* tablero,bool* marcadores,int filas,int columnas) {
+    int totalFichas = filas * columnas;
+
+    // 1. Inicializar marcadores en false
+    for (int i = 0; i < totalFichas; i++) {
+        marcadores[i] = false;
+    }
+    bool hayCombinacion = false;
+
+    // 2. Detectar combinaciones en filas
+    for (int fila = 0; fila < filas; fila++) {
+        int columna = 0;
+        while (columna < columnas) {
+            int posicionActual = calcularPosicionLogica(fila, columna, columnas);
+            unsigned char fichaActual = leerFicha(tablero, posicionActual);
+
+            // Contar fichas iguales consecutivas
+            int contador = 1;
+            while (columna + contador < columnas) {
+                int posicionSiguiente = calcularPosicionLogica(fila, columna + contador, columnas);
+                unsigned char fichaSiguiente = leerFicha(tablero, posicionSiguiente);
+
+                if (fichaSiguiente == fichaActual && fichaActual != FICHA_VACIA) {
+                    contador++;
+                } else {
+                    break;
+                }
+            }
+
+            // Si hay 3 o más, marcar
+            if (contador >= 3) {
+                hayCombinacion = true;
+                for (int k = 0; k < contador; k++) {
+                    int posicionMarcar = calcularPosicionLogica(fila, columna + k, columnas);
+                    marcadores[posicionMarcar] = true;
+                }
+            }
+
+            columna += contador;
+        }
+    }
+
+    // 3. Detectar combinaciones en columnas
+    for (int columna = 0; columna < columnas; columna++) {
+        int fila = 0;
+        while (fila < filas) {
+            int posicionActual = calcularPosicionLogica(fila, columna, columnas);
+            unsigned char fichaActual = leerFicha(tablero, posicionActual);
+
+            // Contar fichas iguales consecutivas
+            int contador = 1;
+            while (fila + contador < filas) {
+                int posicionSiguiente = calcularPosicionLogica(fila + contador, columna, columnas);
+                unsigned char fichaSiguiente = leerFicha(tablero, posicionSiguiente);
+
+                if (fichaSiguiente == fichaActual && fichaActual != FICHA_VACIA) {
+                    contador++;
+                } else {
+                    break;
+                }
+            }
+
+            // Si hay 3 o más, marcar
+            if (contador >= 3) {
+                hayCombinacion = true;
+                for (int k = 0; k < contador; k++) {
+                    int posicionMarcar = calcularPosicionLogica(fila + k, columna, columnas);
+                    marcadores[posicionMarcar] = true;
+                }
+            }
+
+            fila += contador;
+        }
+    }
+
+    return hayCombinacion;
+}
+void eliminarFichasMarcadas(unsigned char* tablero, const bool* marcadores, int filas, int columnas) {
+    int totalFichas = filas * columnas;
+
+    for (int posicion = 0; posicion < totalFichas; posicion++) {
+        if (marcadores[posicion]) {
+            escribirFicha(tablero, posicion, FICHA_VACIA);
+        }
+        aplicarGravedadEnColumna(tablero, filas, columnas);
+    }
 }
