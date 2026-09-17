@@ -5,18 +5,16 @@ using namespace std;
 
 
 void agregarFila(unsigned char*& tablero, int& filas, int columnas, int posicionNuevaFila) {
-    // Se puede insertar desde la fila 0 hasta después de la última fila.
+
     if (posicionNuevaFila < 0 || posicionNuevaFila > filas) {
         cout << "usted está agregando en una posicion que no existe" << endl;
         return;
     }
 
     int filasNuevas = filas + 1;
-
     int bytesNuevos = calcularCantidadBytes(filasNuevas, columnas);
     unsigned char* tableroNuevo = new unsigned char[bytesNuevos];
 
-    // Inicializar todos los bytes para evitar bits con basura.
     for (int i = 0; i < bytesNuevos; i++) {
         tableroNuevo[i] = 0;
     }
@@ -53,6 +51,51 @@ void agregarFila(unsigned char*& tablero, int& filas, int columnas, int posicion
     filas = filasNuevas;
 }
 
+void eliminarFila(unsigned char*& tablero, int& filas, int columnas, int filaEliminar) {
+    if (filaEliminar < 0 || filaEliminar >= filas) {
+        cout << "Esa fila no existe" << endl;
+        return;
+    }
+    if (filas <= 1) {
+        cout << "el tablero no puede quedar sin filas" << endl;
+        return;
+    }
+
+    int filasNuevas = filas - 1;
+
+    int bytesNuevos = calcularCantidadBytes(filasNuevas, columnas);
+    unsigned char* tableroNuevo = new unsigned char[bytesNuevos];
+
+    for (int i = 0; i < bytesNuevos; i++) {
+        tableroNuevo[i] = 0;
+    }
+
+    // Copiar todas las filas excepto la que será eliminada.
+    for (int filaVieja = 0; filaVieja < filas; filaVieja++) {
+        if (filaVieja != filaEliminar) {
+            int filaNueva;
+
+            // Las filas antes de la eliminada quedan en la misma posición.
+            if (filaVieja < filaEliminar) {
+                filaNueva = filaVieja;
+            } else {
+                // Las posteriores suben una posición.
+                filaNueva = filaVieja - 1;
+            }
+
+            for (int columna = 0; columna < columnas; columna++) {
+                int posicionVieja = calcularPosicionLogica(filaVieja, columna, columnas);
+                int posicionNueva = calcularPosicionLogica(filaNueva, columna, columnas);
+                unsigned char ficha = leerFicha(tablero, posicionVieja);
+                escribirFicha(tableroNuevo, posicionNueva, ficha);
+            }
+        }
+    }
+
+    delete[] tablero;
+    tablero = tableroNuevo;
+    filas = filasNuevas;
+}
 //-------------------------------
 //-----------  MAIN  ------------
 //-------------------------------
@@ -97,6 +140,13 @@ int main() {
     cin >> filaNueva;
     agregarFila(tablero,filas,columnas, filaNueva);
     mostrarTableroNumerico(tablero, filas, columnas);
+
+    cout << "Ingrese la fila a eliminar" << endl;
+    cin >> filaNueva;
+    eliminarFila(tablero,filas,columnas, filaNueva);
+    mostrarTableroNumerico(tablero, filas, columnas);
+
+
     delete[] tablero;
 
 
