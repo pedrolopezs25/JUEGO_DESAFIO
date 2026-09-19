@@ -301,3 +301,194 @@ void procesarCombinaciones(unsigned char* tablero, int filas, int columnas, int&
     delete[] marcadores;
 
 }
+
+
+
+//MEMORIA DINAMICA
+void agregarFila(unsigned char*& tablero, int& filas, int columnas, int posicionNuevaFila) {
+
+    if (posicionNuevaFila < 0 || posicionNuevaFila > filas) {
+        cout << "usted está agregando en una posicion que no existe" << endl;
+        return;
+    }
+
+    int filasNuevas = filas + 1;
+    int bytesNuevos = calcularCantidadBytes(filasNuevas, columnas);
+    unsigned char* tableroNuevo = new unsigned char[bytesNuevos];
+
+    for (int i = 0; i < bytesNuevos; i++) {
+        tableroNuevo[i] = 0;
+    }
+
+    // Copiar las filas originales antes de la nueva fila.
+    for (int fila = 0; fila < posicionNuevaFila; fila++) {
+        for (int columna = 0; columna < columnas; columna++) {
+            int posicionVieja = calcularPosicionLogica(fila, columna, columnas);
+            int posicionNueva = calcularPosicionLogica(fila, columna, columnas);
+            unsigned char ficha = leerFicha(tablero, posicionVieja);
+            escribirFicha(tableroNuevo, posicionNueva, ficha);
+        }
+    }
+
+    // Llenar la fila insertada con fichas aleatorias.
+    for (int columna = 0; columna < columnas; columna++) {
+        int posicionNueva = calcularPosicionLogica(posicionNuevaFila, columna, columnas);
+        unsigned char ficha = rand() % 6;
+        escribirFicha(tableroNuevo, posicionNueva, ficha);
+    }
+
+    // Copiar las filas originales desde la posición de inserción.
+    // Su destino se desplaza una fila hacia abajo.
+    for (int fila = posicionNuevaFila; fila < filas; fila++) {
+        for (int columna = 0; columna < columnas; columna++) {
+            int posicionVieja = calcularPosicionLogica(fila, columna, columnas);
+            int posicionNueva = calcularPosicionLogica(fila + 1, columna, columnas);
+            unsigned char ficha = leerFicha(tablero, posicionVieja);
+            escribirFicha(tableroNuevo, posicionNueva, ficha);
+        }
+    }
+    delete[] tablero;
+    tablero = tableroNuevo;
+    filas = filasNuevas;
+}
+
+void eliminarFila(unsigned char*& tablero, int& filas, int columnas, int filaEliminar) {
+    if (filaEliminar < 0 || filaEliminar >= filas) {
+        cout << "Esa fila no existe" << endl;
+        return;
+    }
+    if (filas <= 1) {
+        cout << "el tablero no puede quedar sin filas" << endl;
+        return;
+    }
+
+    int filasNuevas = filas - 1;
+
+    int bytesNuevos = calcularCantidadBytes(filasNuevas, columnas);
+    unsigned char* tableroNuevo = new unsigned char[bytesNuevos];
+
+    for (int i = 0; i < bytesNuevos; i++) {
+        tableroNuevo[i] = 0;
+    }
+
+    // Copiar todas las filas excepto la que será eliminada.
+    for (int filaVieja = 0; filaVieja < filas; filaVieja++) {
+        if (filaVieja != filaEliminar) {
+            int filaNueva;
+
+            // Las filas antes de la eliminada quedan en la misma posición.
+            if (filaVieja < filaEliminar) {
+                filaNueva = filaVieja;
+            } else {
+                // Las posteriores suben una posición.
+                filaNueva = filaVieja - 1;
+            }
+
+            for (int columna = 0; columna < columnas; columna++) {
+                int posicionVieja = calcularPosicionLogica(filaVieja, columna, columnas);
+                int posicionNueva = calcularPosicionLogica(filaNueva, columna, columnas);
+                unsigned char ficha = leerFicha(tablero, posicionVieja);
+                escribirFicha(tableroNuevo, posicionNueva, ficha);
+            }
+        }
+    }
+
+    delete[] tablero;
+    tablero = tableroNuevo;
+    filas = filasNuevas;
+}
+
+void agregarColumna(unsigned char*& tablero, int filas, int& columnas, int posicionNuevaColumna) {
+    if (posicionNuevaColumna < 0 ||posicionNuevaColumna > columnas) {
+        cout << "estas intentando poner una columna en una posicion que no existe "<< endl;
+        return;
+    }
+    int columnasNuevas = columnas + 1;
+    int bytesNuevos = calcularCantidadBytes(filas, columnasNuevas);
+    unsigned char* tableroNuevo = new unsigned char[bytesNuevos];
+
+    for (int i = 0; i < bytesNuevos; i++) {
+        tableroNuevo[i] = 0;
+    }
+
+    for (int fila = 0; fila < filas; fila++) {
+        for (int columnaNueva = 0; columnaNueva < columnasNuevas; columnaNueva++) {
+
+            int posicionDestino = calcularPosicionLogica(fila, columnaNueva, columnasNuevas);
+            if (columnaNueva == posicionNuevaColumna) {
+                unsigned char fichaNueva = rand() % 6;
+                escribirFicha(tableroNuevo, posicionDestino, fichaNueva);
+            } else {
+                int columnaVieja;
+                if (columnaNueva < posicionNuevaColumna) {
+                    columnaVieja = columnaNueva;
+                } else {
+                    // Después de insertar, tomar la ficha de una columna atrás.
+                    columnaVieja = columnaNueva - 1;
+                }
+
+                int posicionOrigen = calcularPosicionLogica(fila, columnaVieja, columnas);
+
+                unsigned char ficha = leerFicha(tablero, posicionOrigen);
+
+                escribirFicha(tableroNuevo,
+                              posicionDestino,
+                              ficha);
+            }
+        }
+    }
+
+    delete[] tablero;
+    tablero = tableroNuevo;
+    columnas = columnasNuevas;
+}
+
+void eliminarColumna(unsigned char*& tablero, int filas, int& columnas, int columnaEliminar) {
+
+    if (columnaEliminar < 0 || columnaEliminar >= columnas) {
+        cout<< "la columna ingresada no existe "<< endl;
+        return;
+    }
+
+    if (columnas <= 1) {
+        return;
+    }
+
+    int columnasNuevas = columnas - 1;
+
+    int bytesNuevos = calcularCantidadBytes(filas, columnasNuevas);
+
+    unsigned char* tableroNuevo = new unsigned char[bytesNuevos];
+
+    for (int i = 0; i < bytesNuevos; i++) {
+        tableroNuevo[i] = 0;
+    }
+
+    for (int fila = 0; fila < filas; fila++) {
+        for (int columnaNueva = 0;
+             columnaNueva < columnasNuevas;
+             columnaNueva++) {
+
+            int columnaVieja;
+
+            // Antes de la columna eliminada, las columnas no cambian.
+            if (columnaNueva < columnaEliminar) {
+                columnaVieja = columnaNueva;
+            } else {
+                // Después de la eliminada, tomar la ficha de una columna a la derecha.
+                columnaVieja = columnaNueva + 1;
+            }
+
+            int posicionOrigen = calcularPosicionLogica(fila, columnaVieja, columnas);
+
+            int posicionDestino = calcularPosicionLogica(fila, columnaNueva, columnasNuevas);
+
+            unsigned char ficha = leerFicha(tablero, posicionOrigen);
+
+            escribirFicha(tableroNuevo, posicionDestino, ficha);
+        }
+    }
+    delete[] tablero;
+    tablero = tableroNuevo;
+    columnas = columnasNuevas;
+}

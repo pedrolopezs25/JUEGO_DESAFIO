@@ -28,5 +28,9 @@ bool detectarCombinaciones(const unsigned char* tablero,bool* marcadores,int fil
 void eliminarFichasMarcadas(unsigned char* tablero, const bool* marcadores, int filas, int columnas);
 void procesarCombinaciones(unsigned char* tablero, int filas, int columnas, int& cascadas, int& fichasEliminadas);
 
+void agregarColumna(unsigned char*& tablero, int filas, int& columnas, int posicionNuevaColumna);
+void eliminarColumna(unsigned char*& tablero, int filas, int& columnas, int columnaEliminar);
+void eliminarFila(unsigned char*& tablero, int& filas, int columnas, int filaEliminar);
+void agregarFila(unsigned char*& tablero, int& filas, int columnas, int posicionNuevaFila);
 #endif // FUNCIONES_H
 
