@@ -96,6 +96,51 @@ void eliminarFila(unsigned char*& tablero, int& filas, int columnas, int filaEli
     tablero = tableroNuevo;
     filas = filasNuevas;
 }
+
+void agregarColumna(unsigned char*& tablero, int filas, int& columnas, int posicionNuevaColumna) {
+    if (posicionNuevaColumna < 0 ||posicionNuevaColumna > columnas) {
+        cout << "estas intentando poner una columna en una posicion que no existe "<< endl;
+        return;
+    }
+    int columnasNuevas = columnas + 1;
+    int bytesNuevos = calcularCantidadBytes(filas, columnasNuevas);
+    unsigned char* tableroNuevo = new unsigned char[bytesNuevos];
+
+    for (int i = 0; i < bytesNuevos; i++) {
+        tableroNuevo[i] = 0;
+    }
+
+    for (int fila = 0; fila < filas; fila++) {
+        for (int columnaNueva = 0; columnaNueva < columnasNuevas; columnaNueva++) {
+
+            int posicionDestino = calcularPosicionLogica(fila, columnaNueva, columnasNuevas);
+            if (columnaNueva == posicionNuevaColumna) {
+                unsigned char fichaNueva = rand() % 6;
+                escribirFicha(tableroNuevo, posicionDestino, fichaNueva);
+            } else {
+                int columnaVieja;
+                if (columnaNueva < posicionNuevaColumna) {
+                    columnaVieja = columnaNueva;
+                } else {
+                    // Después de insertar, tomar la ficha de una columna atrás.
+                    columnaVieja = columnaNueva - 1;
+                }
+
+                int posicionOrigen = calcularPosicionLogica(fila, columnaVieja, columnas);
+
+                unsigned char ficha = leerFicha(tablero, posicionOrigen);
+
+                escribirFicha(tableroNuevo,
+                              posicionDestino,
+                              ficha);
+            }
+        }
+    }
+
+    delete[] tablero;
+    tablero = tableroNuevo;
+    columnas = columnasNuevas;
+}
 //-------------------------------
 //-----------  MAIN  ------------
 //-------------------------------
@@ -146,6 +191,11 @@ int main() {
     eliminarFila(tablero,filas,columnas, filaNueva);
     mostrarTableroNumerico(tablero, filas, columnas);
 
+    int posicionNuevaColumna;
+    cout << "Ingrese la fila a eliminar" << endl;
+    cin >> posicionNuevaColumna;
+    agregarColumna(tablero,filas, columnas,posicionNuevaColumna);
+    mostrarTableroNumerico(tablero, filas, columnas);
 
     delete[] tablero;
 
